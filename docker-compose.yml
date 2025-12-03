@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:16
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-appdb}
+      - POSTGRES_USER=${POSTGRES_USER:-app}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:8.0-alpine
+    restart: always
+
+  backend:
+    build: .
+    command: make migrate run.server.local
+    ports:
+      - "8000:8000"
+    restart: always
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+
+  celery:
+    build: .
+    command: make celery
+    restart: always
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - backend
+      - redis
+
+  bot:
+    build: .
+    command: make run.bot
+    restart: always
+    volumes:
+      - .:/app
+    depends_on:
+      - backend
+      - redis
+    env_file:
+      - .env
+
+volumes:
+  pgdata:
