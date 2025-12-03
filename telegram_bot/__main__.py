@@ -1,15 +1,22 @@
 import asyncio
-import logging
+import sys
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from loguru import logger
 
 from .config import TELEGRAM_BOT_TOKEN
 from .router import setup_routers
 
-logging.basicConfig(level=logging.INFO)
-
+logger.remove()
+logger.add(
+    sys.stdout,
+    level='DEBUG',
+    format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}',
+    backtrace=True,
+    colorize=True
+)
 
 bot = Bot(
     TELEGRAM_BOT_TOKEN,
