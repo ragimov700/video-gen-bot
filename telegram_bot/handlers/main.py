@@ -12,6 +12,7 @@ from aiogram.types import ChatMemberUpdated, Message
 from loguru import logger
 
 from telegram_bot.api import UserAPIService
+from telegram_bot.texts import START_TEXT
 
 router = Router()
 
@@ -22,7 +23,9 @@ async def command_start(msg: Message, state: FSMContext, command: CommandObject)
     logger.info(f'/start от {msg.from_user.id} ({msg.from_user.full_name})')
     await state.clear()
     await UserAPIService.create_user(user_data=msg.from_user, source=command.args)
-    await msg.answer('Добро пожаловать!')
+    await msg.answer(
+        text=START_TEXT.format(full_name=msg.from_user.full_name)
+    )
 
 
 @router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=KICKED))
