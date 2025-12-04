@@ -12,6 +12,7 @@ from aiogram.types import ChatMemberUpdated, Message
 from loguru import logger
 
 from telegram_bot.api import UserAPIService
+from telegram_bot.keyboards import main_keyboard
 from telegram_bot.texts import START_TEXT
 
 router = Router()
@@ -24,7 +25,8 @@ async def command_start(msg: Message, state: FSMContext, command: CommandObject)
     await state.clear()
     await UserAPIService.create_user(user_data=msg.from_user, source=command.args)
     await msg.answer(
-        text=START_TEXT.format(full_name=msg.from_user.full_name)
+        text=START_TEXT.format(full_name=msg.from_user.full_name),
+        reply_markup=main_keyboard()
     )
 
 
